@@ -1,0 +1,9 @@
+﻿HI! %ReplaceText%
+
+%ReplaceText%%ReplaceText%
+
+butwhatabout%ReplaceText%
+
+ok %ReplaceText%
+
+%ReplaceText% nahg

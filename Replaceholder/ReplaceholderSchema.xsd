@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<xs:schema id="ReplaceholderSchema"
+    elementFormDefault="qualified"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+
+<!--
+  targetNamespace="http://tempuri.org/ReplaceholderSchema.xsd"
+  xmlns="http://tempuri.org/ReplaceholderSchema.xsd"
+ -->
+
+  <xs:element name="Config">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Content" type="Content" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="Content">
+    <xs:sequence>
+      <xs:element name="Value" type="xs:string" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="DataType" type="DataTypeValue" use="required"/>
+    <xs:attribute name="KeyName" type="xs:string" use="required"/>
+    <xs:attribute name="Critical" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+
+  <xs:simpleType name="DataTypeValue">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Text"/>
+      <xs:enumeration value="Path"/>
+      <xs:enumeration value="Placeholder"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

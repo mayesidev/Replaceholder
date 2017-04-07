@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<Config>
+  <Content DataType="Text" KeyName="%ReplaceText%" Critical="true">
+    <Value>This is some text to replace a key with.</Value>
+  </Content>
+</Config>
