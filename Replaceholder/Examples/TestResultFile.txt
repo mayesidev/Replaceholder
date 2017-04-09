@@ -6,4 +6,8 @@ butwhataboutThis is some text to replace a key with.
 
 ok This is some text to replace a key with.
 
-This is some text to replace a key with. nahg
+This is some text to replace a key with. nahh
+
+%NOTReplaceText%
+
+This is some text to replace a key with.

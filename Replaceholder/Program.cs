@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
 
 namespace Replaceholder
 {
@@ -13,117 +7,75 @@ namespace Replaceholder
 	{
 		public static void Main(string[] args)
 		{
-			var xmlFilePath = args[0];
-			var templateFilePath = args[1];
-			var outputFilePath = args[2];
+			var xmlFilePath = string.Empty;
+			var templateFilePath = string.Empty;
+			var outputFilePath = string.Empty;
 
-			if( _ValidateAndSetProgramInputs(xmlFilePath, templateFilePath, outputFilePath) )
+			var numberOfSuppliedArgs = args.Length;
+			if (numberOfSuppliedArgs >= 1)
 			{
-				var config = _ParseConfigXml();
-				var templateContent = File.ReadAllLines(mTemplateFilePath);
+				xmlFilePath = args[0];
+			}
+			if (numberOfSuppliedArgs >= 2)
+			{
+				templateFilePath = args[1];
+			}
+			if (numberOfSuppliedArgs >= 3)
+			{
+				outputFilePath = args[2];
+			}
 
-				var result = _ReplaceContent(config, templateContent);
-				if (string.IsNullOrEmpty(mOutputFilePath))
+			xmlFilePath = _VerifyInput(xmlFilePath, "XML");
+			templateFilePath = _VerifyInput(templateFilePath, "template");
+
+			var replaceResult = ReplaceholderInstance.DoReplaceContent(xmlFilePath, templateFilePath);
+
+			if (_IsInputValid(outputFilePath))
+			{
+				var errorMessage = _TryWriteToFile(outputFilePath, replaceResult);
+				if (!errorMessage.Equals(string.Empty))
 				{
-					Console.Out.Write(result);
+					Console.Out.WriteLine(errorMessage);
 				}
-				else
-				{
-					File.WriteAllText(mOutputFilePath, result);
-				}
+			}
+			else
+			{
+				Console.Out.WriteLine(replaceResult);
 			}
 		}
 
-		private static string _ReplaceContent(Config config, string[] template)
+		private static bool _IsInputValid(string input)
 		{
-			string result = string.Empty;
-			foreach (var line in template)
+			return !string.IsNullOrWhiteSpace(input);
+		}
+
+		private static string _PromptForInput(string inputName)
+		{
+			Console.Out.WriteLine("Please supply a valid value for the {0} file path:", inputName);
+			return Console.ReadLine();
+		}
+
+		private static string _TryWriteToFile(string path, string contents)
+		{
+			var errorMessage = string.Empty;
+			try
 			{
-				var replacedLine = line;
-				foreach(var content in config.Content )
-				{
-					switch (content.DataType)
-					{
-						case DataTypeValue.Text:
-							replacedLine = _ReplaceText(content, replacedLine);
-							break;
-						case DataTypeValue.Path:
-
-							break;
-						case DataTypeValue.Placeholder:
-							break;
-						default:
-							var errorMessage = string.Format("DataTypeValue of '{0}' not supported.", content.DataType);
-							throw new InvalidOperationException(errorMessage);
-					}
-				}
-				result = string.Concat(result, replacedLine, Environment.NewLine);
+				File.WriteAllText(path, contents);
 			}
-
-			return result;
-		}
-
-		private static string _ReplaceText(Content content, string line)
-		{
-			if(line.Contains(content.KeyName))
+			catch (Exception ex)
 			{
-				line = line.Replace(content.KeyName, content.Value);
+				errorMessage = string.Format("Exception occurred when trying to write to file.{0}Exception was: '{1}'{0}File path was: '{2}'", Environment.NewLine, ex.Message, path);
 			}
-
-			return line;
+			return errorMessage;
 		}
 
-		private static string _ReplacePath(Content content, string line)
+		private static string _VerifyInput(string input, string inputName)
 		{
-			throw new NotImplementedException();
-		}
-
-		private static string _ReplacePlaceholder(Content content, string line)
-		{
-			throw new NotImplementedException();
-		}
-
-		private static Config _ParseConfigXml()
-		{
-			var serializer = new XmlSerializer(typeof(Config));
-			var fileStream = File.OpenRead(mXmlFilePath);
-			var reader = XmlReader.Create(fileStream);
-			var xml = serializer.Deserialize(reader);
-
-			return (Config)xml;
-		}
-
-		private static string mXmlFilePath;
-		private static string mTemplateFilePath;
-		private static string mOutputFilePath;
-
-		private static bool _ValidateAndSetProgramInputs(string xmlFilePath, string templateFilePath, string outputFilePath)
-		{
-			var xmlPathIsNull = string.IsNullOrWhiteSpace(xmlFilePath);
-			var templatePathIsNull = string.IsNullOrWhiteSpace(templateFilePath);
-			var outputPathIsNull = string.IsNullOrWhiteSpace(outputFilePath);
-
-			var validInputs = false;
-			if(!xmlPathIsNull && !templatePathIsNull)
+			while (!_IsInputValid(input))
 			{
-				if (File.Exists(xmlFilePath))
-				{
-					mXmlFilePath = xmlFilePath;
-
-					if (File.Exists(templateFilePath))
-					{
-						mTemplateFilePath = templateFilePath;
-
-						mOutputFilePath = !outputPathIsNull && File.Exists(outputFilePath)
-							? outputFilePath
-							: string.Empty;
-
-						validInputs = true;
-					}
-				}
+				input = _PromptForInput(inputName);
 			}
-			return validInputs;
+			return input;
 		}
-
 	}
 }

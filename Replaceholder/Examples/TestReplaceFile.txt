@@ -6,4 +6,8 @@ butwhatabout%ReplaceText%
 
 ok %ReplaceText%
 
-%ReplaceText% nahg
+%ReplaceText% nahh
+
+%NOTReplaceText%
+
+%ReplaceText%
